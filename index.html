@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Nixin Studio</title>
+  <meta name="description" content="Nixin Studio is an independent game studio. Explore our games.">
+  <meta name="theme-color" content="#07070b">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=Space+Grotesk:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <script type="importmap">
+    { "imports": { "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js" } }
+  </script>
+</head>
+<body>
+
+  <!-- ───────────── 1 · HOME (desktop / phone home screen) ───────────── -->
+  <section id="home" class="os locked">
+    <div class="os-screen">
+      <div class="os-wall" aria-hidden="true">
+        <div class="wall-glow"></div>
+        <div class="wall-grid"></div>
+        <div class="wall-word">NIXIN</div>
+      </div>
+
+      <canvas id="hero-canvas" aria-label="Nixin Studio logo made of particles. Move your pointer over it."></canvas>
+
+      <div class="os-status">
+        <span data-clock="time"></span>
+        <span class="os-status-r">
+          <i class="sig"></i><i class="wifi"></i><i class="batt"></i>
+          <button class="os-lockbtn" data-lock aria-label="Lock screen">
+            <svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+          </button>
+        </span>
+      </div>
+
+      <div class="home-layout">
+        <aside class="os-widget">
+          <div class="w-time" data-clock="big"></div>
+          <div class="w-date" data-clock="long"></div>
+          <div class="w-copy">
+            <p class="eyebrow">Nixin Studio · Independent game studio</p>
+            <p class="w-line">We build tiny worlds<br>you can't put down.</p>
+            <p class="w-hint">Move through the logo. It flows back.</p>
+          </div>
+        </aside>
+        <div class="home-logo-slot" aria-hidden="true"></div>
+        <nav class="os-icons" aria-label="Home screen apps"></nav>
+      </div>
+
+      <div class="os-windows"></div>
+
+      <div class="os-startmenu" role="menu">
+        <div class="sm-head"><img data-logo alt=""><div><b>Nixin Studio</b><small>Pinned</small></div></div>
+        <div class="sm-list"></div>
+        <button class="sm-lock" data-lock>
+          <svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+          Lock
+        </button>
+      </div>
+
+      <footer class="os-taskbar">
+        <button class="os-start" aria-label="Start"><img data-logo alt=""></button>
+        <div class="os-search">Search Nixin</div>
+        <div class="os-running"></div>
+        <div class="os-tray">
+          <button class="os-lockbtn" data-lock aria-label="Lock screen">
+            <svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+          </button>
+          <div><span data-clock="time"></span><span data-clock="date"></span></div>
+        </div>
+      </footer>
+      <nav class="os-dock" aria-label="Dock"></nav>
+
+      <div class="lock">
+        <div class="lock-track">
+          <span class="lock-label">Slide to unlock</span>
+          <button class="lock-knob" aria-label="Unlock (press Enter or drag right)">
+            <svg class="i-locked" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+            <svg class="i-open" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 7.5-2"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="os-homebar"></div>
+    </div>
+  </section>
+
+  <!-- ───────────── 2 · GAMES (reels) ───────────── -->
+  <section id="games" class="games">
+    <div class="games-sticky">
+      <div class="games-ambient" aria-hidden="true"></div>
+      <a href="#home" class="games-home" aria-label="Back to home screen"><img data-logo alt=""><span>Home</span></a>
+      <header class="games-head">
+        <p class="eyebrow">Our games</p>
+        <h2>Scroll the feed.</h2>
+        <p class="muted hint-desktop">Scroll for the next game. Swipe sideways on the phone (or use ← →) for more screens.</p>
+        <p class="muted hint-mobile">Swipe sideways on the phone for more screens.</p>
+      </header>
+      <ol class="games-list"></ol>
+      <div class="games-counter">01 / 05</div>
+
+      <div class="stage">
+        <div class="deck"></div>
+        <div class="phone">
+          <div class="phone-island"></div>
+          <div class="phone-screen">
+            <div class="reel-track"></div>
+            <div class="reel-top">
+              <b>Reels</b>
+              <svg viewBox="0 0 24 24"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg>
+            </div>
+          </div>
+        </div>
+        <button class="deck-btn deck-prev" aria-label="Previous screenshot">‹</button>
+        <button class="deck-btn deck-next" aria-label="Next screenshot">›</button>
+      </div>
+    </div>
+  </section>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

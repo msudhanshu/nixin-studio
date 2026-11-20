@@ -1,0 +1,320 @@
+{
+  "games": [
+    {
+      "id": "alchemy",
+      "slug": "alchemy",
+      "name": "Alchemy",
+      "tagline": "Fuse elements. Form compounds.",
+      "description": "A match-3 merge puzzle about real chemistry. Swap, slide or scroll neighbouring elements into line so they fuse into a higher tier — then into compounds. Climb RnD Centers, react in the lab, and unlock notebook pages for every element and compound: the reaction, where it is used, and how we get it. The chemistry puzzle for grown-ups.",
+      "genre": "Puzzle · Merge",
+      "tags": ["puzzle", "merge", "chemistry"],
+      "accent": "#C8F54A",
+      "palette": ["#071A14", "#0E3D30", "#C8F54A", "#7EE8C8"],
+      "icon": "assets/games/alchemy/icon.jpg",
+      "thumbnail": "assets/games/alchemy/thumbnail.jpg",
+      "gallery": [
+        {
+          "src": "assets/games/alchemy/gallery/home.jpg",
+          "title": "Match 3 Merge",
+          "caption": "Shift, match and fuse elements in the lab."
+        },
+        {
+          "src": "assets/games/alchemy/gallery/board.jpg",
+          "title": "Swap",
+          "caption": "Trade neighbouring elements to merge them up the table."
+        },
+        {
+          "src": "assets/games/alchemy/gallery/lab-map.jpg",
+          "title": "RnD Centers",
+          "caption": "Climb the lab map. Each level unlocks a new reaction."
+        },
+        {
+          "src": "assets/games/alchemy/gallery/notes-contents.jpg",
+          "title": "Lab notebook",
+          "caption": "Precious metals, rare crystals, salts and more — all in the notes."
+        },
+        {
+          "src": "assets/games/alchemy/gallery/notes-calcium.jpg",
+          "title": "Elements",
+          "caption": "Craft each element, then read its atomic structure."
+        },
+        {
+          "src": "assets/games/alchemy/gallery/notes-quicklime.jpg",
+          "title": "Compounds",
+          "caption": "See the reaction, real-world uses, and how we make it."
+        }
+      ],
+      "video": null,
+      "page": "game.html?id=alchemy",
+      "store": {
+        "play": "https://play.google.com/store/apps/details?id=com.nixin.alchemym3m",
+        "androidPackage": "com.nixin.alchemym3m"
+      },
+      "tryable": false,
+      "published": true
+    },
+    {
+      "id": "memory_path",
+      "slug": "memory-path",
+      "name": "Memory Path",
+      "tagline": "Watch the path. Walk it from memory.",
+      "description": "A path lights up once. Then it is gone, and you have to walk it from memory — tile by tile, with lives on the line. Four arenas push the same idea further: a glowing tile grid, node graphs across rivers and neon nights, a scout helicopter over the city, and first-person mazes you only saw once.",
+      "genre": "Puzzle · Memory",
+      "tags": ["puzzle", "memory", "casual"],
+      "accent": "#2ED4BF",
+      "palette": ["#0A0D21", "#212961", "#2ED4BF", "#FFC740"],
+      "icon": "assets/games/memory_path/icon.jpg",
+      "thumbnail": "assets/games/memory_path/thumbnail.jpg",
+      "gallery": [
+        {
+          "src": "assets/games/memory_path/gallery/tile.jpg",
+          "title": "Tile Arena",
+          "caption": "Memorize a glowing path, then walk it tile by tile."
+        },
+        {
+          "src": "assets/games/memory_path/gallery/graph.jpg",
+          "title": "Graph Arena",
+          "caption": "Hop between nodes across rivers, towns and neon nights."
+        },
+        {
+          "src": "assets/games/memory_path/gallery/scout.jpg",
+          "title": "Scout Arena",
+          "caption": "Fly the scout helicopter and read the city from above."
+        },
+        {
+          "src": "assets/games/memory_path/gallery/maze.jpg",
+          "title": "Maze Arena",
+          "caption": "Walk first-person corridors you only saw once."
+        }
+      ],
+      "video": null,
+      "page": "game.html?id=memory_path",
+      "store": {
+        "play": "https://play.google.com/store/apps/details?id=com.nixin.memorizewayhome",
+        "androidPackage": "com.nixin.memorizewayhome"
+      },
+      "tryable": true,
+      "published": true
+    },
+    {
+      "id": "unlock_disk",
+      "slug": "unlock-disk",
+      "name": "Unlock Disk",
+      "tagline": "Slide, swap and scroll colours into place.",
+      "description": "Unlock Disk is a colour-matching puzzle on spinning disks. Slide pieces around a gap, swap neighbouring tiles, or scroll rings and rows until every ring is one colour. Later levels cut famous paintings into the same spinning disks, so you are rebuilding a picture as well as solving a puzzle.",
+      "genre": "Puzzle · Sliding",
+      "tags": ["puzzle", "sliding", "colors"],
+      "accent": "#00D1EB",
+      "palette": ["#0F0E36", "#1F2161", "#00D1EB", "#FF9E00"],
+      "icon": "assets/games/unlock_disk/icon.jpg",
+      "thumbnail": "assets/games/unlock_disk/thumbnail.jpg",
+      "gallery": [
+        {
+          "src": "assets/games/unlock_disk/gallery/slide_mode.jpg",
+          "title": "Slide Mode",
+          "caption": "Slide pieces round the disk until every ring matches."
+        },
+        {
+          "src": "assets/games/unlock_disk/gallery/swap_mode.jpg",
+          "title": "Swap Mode",
+          "caption": "Trade neighbouring tiles until every ring is one colour."
+        },
+        {
+          "src": "assets/games/unlock_disk/gallery/scroll_mode.jpg",
+          "title": "Scroll Mode",
+          "caption": "Spin rings and rows on disks, stacks and cubes."
+        },
+        {
+          "src": "assets/games/unlock_disk/gallery/picture_disk.jpg",
+          "title": "Picture Puzzles",
+          "caption": "Rebuild famous paintings cut into spinning disks."
+        }
+      ],
+      "video": null,
+      "page": "game.html?id=unlock_disk",
+      "store": {
+        "play": "https://play.google.com/store/apps/details?id=com.nixin.unlockdisk",
+        "androidPackage": "com.nixin.unlockdisk"
+      },
+      "tryable": true,
+      "published": true
+    },
+    {
+      "id": "word_trail",
+      "slug": "word-trail",
+      "name": "WordTrail",
+      "tagline": "Trace the trail before the targets fade.",
+      "description": "Swipe a trail of touching hexes to spell the targets before they fade. Some words are shown as pictures, some are jumbled with the first letter kept, and later modes swap numbers, slide symbols into a gap, or scroll the honeycomb itself. Quick to learn, and the clock is always running.",
+      "genre": "Word · Puzzle",
+      "tags": ["word", "puzzle", "hex"],
+      "accent": "#FFA62B",
+      "palette": ["#0F173D", "#213370", "#FFA62B", "#78EBFF"],
+      "icon": "assets/games/word_trail/icon.jpg",
+      "thumbnail": "assets/games/word_trail/thumbnail.jpg",
+      "gallery": [
+        {
+          "src": "assets/games/word_trail/gallery/honeycomb_trail.jpg",
+          "title": "Picture & Jumble Trails",
+          "caption": "Spell what you see, unscramble the rest."
+        },
+        {
+          "src": "assets/games/word_trail/gallery/number_swap.jpg",
+          "title": "Swap Numbers",
+          "caption": "Swap tiles until a line adds up."
+        },
+        {
+          "src": "assets/games/word_trail/gallery/symbol_slide.jpg",
+          "title": "Slide Symbols",
+          "caption": "Slide tiles into the gap to line up the symbols."
+        },
+        {
+          "src": "assets/games/word_trail/gallery/word_scroll_hex.jpg",
+          "title": "Honeycomb Scroll",
+          "caption": "Scroll the honeycomb to spell words."
+        }
+      ],
+      "video": null,
+      "page": "game.html?id=word_trail",
+      "store": {
+        "play": "https://play.google.com/store/apps/details?id=com.nixinstudio.wordtrail",
+        "androidPackage": "com.nixinstudio.wordtrail"
+      },
+      "tryable": true,
+      "published": true
+    },
+    {
+      "id": "movieyapa",
+      "slug": "movieyapa",
+      "name": "Movieyapa",
+      "tagline": "Guess the film. Emoji, charades, scenes.",
+      "description": "Guess the film from emoji plots, dumb-charade clues, jumbled dialogues and ripple scenes. Movieyapa covers Bollywood, Tollywood, Hollywood and Bhojpuri hits, with mix grids and daily events mixed in. Fewer clues means more points — lights, camera, guess.",
+      "genre": "Trivia · Movies",
+      "tags": ["trivia", "movies", "bollywood"],
+      "accent": "#F5B838",
+      "palette": ["#140D08", "#4D301C", "#F5B838", "#FAEDCF"],
+      "icon": "assets/games/movieyapa/icon.jpg",
+      "thumbnail": "assets/games/movieyapa/thumbnail.jpg",
+      "gallery": [
+        {
+          "src": "assets/games/movieyapa/gallery/industries.jpg",
+          "title": "Every Film Industry",
+          "caption": "Bollywood, Tollywood, Hollywood and Bhojpuri hits."
+        },
+        {
+          "src": "assets/games/movieyapa/gallery/charade.jpg",
+          "title": "Dumb Charade",
+          "caption": "Reveal clues one by one. Fewer clues, more points."
+        },
+        {
+          "src": "assets/games/movieyapa/gallery/emoji.jpg",
+          "title": "Emoji Puzzles",
+          "caption": "Guess the film from the plot or title told in emoji."
+        },
+        {
+          "src": "assets/games/movieyapa/gallery/dialogue.jpg",
+          "title": "Lines, Stories & Scenes",
+          "caption": "Unscramble dialogues and test your film memory."
+        },
+        {
+          "src": "assets/games/movieyapa/gallery/cinema_world.jpg",
+          "title": "Cinema World",
+          "caption": "Mix grids, ripples and daily events. Lights, camera, guess!"
+        }
+      ],
+      "video": null,
+      "page": "game.html?id=movieyapa",
+      "store": {
+        "play": "https://play.google.com/store/apps/details?id=com.nixin.movieyapa",
+        "androidPackage": "com.nixin.movieyapa"
+      },
+      "tryable": true,
+      "published": true
+    },
+    {
+      "id": "hidden_mosaic",
+      "slug": "hidden-mosaic",
+      "name": "Hidden Mosaic",
+      "tagline": "Find the hidden faces inside the mosaic.",
+      "description": "A picture starts as a grey mosaic of tiny shapes. Drag a magnifier over it to reveal colour, then tap the faces hidden among the tiles — animals tucked into thousands of pieces. Find every face and the whole mosaic bursts into colour.",
+      "genre": "Puzzle · Hidden object",
+      "tags": ["puzzle", "hiddenObject", "mosaic"],
+      "accent": "#7C4DFF",
+      "palette": ["#1C1242", "#6B3BFF", "#7C4DFF", "#FFC93D"],
+      "icon": "assets/games/hidden_mosaic/icon.jpg",
+      "thumbnail": "assets/games/hidden_mosaic/thumbnail.jpg",
+      "gallery": [
+        {
+          "src": "assets/games/hidden_mosaic/gallery/feature1.jpg",
+          "title": "Magnify the mosaic",
+          "caption": "Slide the lens over a grey picture to reveal its colours."
+        },
+        {
+          "src": "assets/games/hidden_mosaic/gallery/feature2.jpg",
+          "title": "Spot the hidden faces",
+          "caption": "Animals hide among thousands of tiny shapes. Tap them all."
+        },
+        {
+          "src": "assets/games/hidden_mosaic/gallery/feature3.jpg",
+          "title": "Reveal the picture",
+          "caption": "Find every face and the whole mosaic bursts into colour."
+        }
+      ],
+      "video": null,
+      "page": "game.html?id=hidden_mosaic",
+      "store": {
+        "play": "https://play.google.com/store/apps/details?id=com.nixin.hiddenmosaic",
+        "androidPackage": "com.nixin.hiddenmosaic"
+      },
+      "tryable": true,
+      "published": true
+    },
+    {
+      "id": "card_board_games",
+      "slug": "cards-and-board-games",
+      "name": "Cards & Board Games",
+      "tagline": "Cards, Ludo, Chess, UNO, Trump, Mafia.",
+      "description": "A table of studio card and board games in one place. Play Teen Patti, Bluff, Hearts and 29, race in Ludo, sit down for Chess, match colours in UNO, call trump, or bluff your way through Mafia — solo or with friends.",
+      "genre": "Cards · Board",
+      "tags": ["cards", "board", "multiplayer"],
+      "accent": "#DB3359",
+      "palette": ["#1A080C", "#4A1520", "#DB3359", "#F4B942"],
+      "icon": "assets/games/card_board_games/icon.jpg",
+      "thumbnail": "assets/games/card_board_games/thumbnail.jpg",
+      "gallery": [
+        {
+          "src": "assets/games/card_board_games/gallery/feature1.jpg",
+          "title": "Card Games",
+          "caption": "Teen Patti, Bluff, Hearts, 29 and more, solo or with friends."
+        },
+        {
+          "src": "assets/games/card_board_games/gallery/feature2.jpg",
+          "title": "Ludo",
+          "caption": "Roll, race and capture. Classic Ludo for 2 to 4 players."
+        },
+        {
+          "src": "assets/games/card_board_games/gallery/feature3.jpg",
+          "title": "Chess",
+          "caption": "Play the classic, solo or 2v2 with friends."
+        },
+        {
+          "src": "assets/games/card_board_games/gallery/feature4.jpg",
+          "title": "UNO + Trump",
+          "caption": "Match colours in UNO, call the trump in Trump games."
+        },
+        {
+          "src": "assets/games/card_board_games/gallery/feature5.jpg",
+          "title": "Mafia",
+          "caption": "Bluff, accuse and survive in the party game of deception."
+        }
+      ],
+      "video": null,
+      "page": "game.html?id=card_board_games",
+      "store": {
+        "play": "https://play.google.com/store/apps/details?id=com.DefaultCompany.inhousecardboard",
+        "androidPackage": "com.DefaultCompany.inhousecardboard"
+      },
+      "tryable": false,
+      "published": true
+    }
+  ]
+}
