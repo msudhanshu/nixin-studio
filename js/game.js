@@ -1,5 +1,6 @@
 import { loadGames, findGame, assetUrl, pageUrl } from './catalog.js';
 import { loadLogo, logoDataURL } from './logo.js';
+import { moreSection } from './more.js';
 
 const icons = {
   play: '<svg viewBox="0 0 24 24"><path d="M7 4v16l13-8z"/></svg>',
@@ -55,22 +56,7 @@ function render(game, others) {
         </figure>`).join('')}
     </section>
 
-    ${others.length ? `
-      <section class="gp-more">
-        <p class="eyebrow">More from Nixin</p>
-        <ul>
-          ${others.map((g) => `
-            <li>
-              <a href="${esc(pageUrl(g.page))}">
-                <img src="${esc(assetUrl(g.icon))}" alt="">
-                <span>
-                  <b>${esc(g.name)}</b>
-                  <small>${esc(g.tagline)}</small>
-                </span>
-              </a>
-            </li>`).join('')}
-        </ul>
-      </section>` : ''}
+    ${moreSection(others)}
   `;
 }
 

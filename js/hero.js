@@ -16,24 +16,35 @@ function sampleLogo(isMobile) {
   drawLogo(full.getContext('2d', { willReadFrequently: true }), S, 'all');
   const a = full.getContext('2d').getImageData(0, 0, S, S).data;
 
+  // Wordmark + tagline sit below the shield. Sample them denser and keep
+  // them calm so the small type stays readable through the effect.
+  const TEXT_Y = Math.round(S * 0.765);
+  const textStep = isMobile ? 2 : 1;
+
   const pts = [];
-  for (let y = 0; y < S; y += step) {
-    for (let x = 0; x < S; x += step) {
+  for (let y = 0; y < S;) {
+    const text = y >= TEXT_Y;
+    const st = text ? textStep : step;
+    for (let x = 0; x < S; x += st) {
       const i = (y * S + x) * 4;
-      if (a[i + 3] < 140) continue;
+      if (a[i + 3] < (text ? 110 : 140)) continue;
       let r = a[i] / 255, g = a[i + 1] / 255, b = a[i + 2] / 255;
       const lum = 0.22 * r + 0.7 * g + 0.08 * b;
-      if (lum < 0.2) {
-        const t = 0.2 / Math.max(lum, 0.02);
+      const minLum = text ? 0.55 : 0.2;
+      if (lum < minLum) {
+        const t = minLum / Math.max(lum, 0.02);
         r = Math.min(1, r * t); g = Math.min(1, g * t); b = Math.min(1, b * t);
       }
       pts.push({
         x: (x / S - 0.5) * LOGO_WORLD,
         y: -(y / S - 0.5) * LOGO_WORLD,
         r, g, b,
-        front: r + g + b > 1.35,
+        text,
+        sz: st / step,
+        front: !text && r + g + b > 1.35,
       });
     }
+    y += st;
   }
   return { pts, spacing: (step / S) * LOGO_WORLD };
 }
@@ -55,18 +66,22 @@ export function initHero() {
 
   const LAYERS = isMobile ? 2 : 3;
   const DEPTH = 0.11;
-  const count = pts.length * LAYERS;
+  // Text gets a single layer: stacked depth layers ghost/blur small type.
+  const textPts = pts.filter((p) => p.text).length;
+  const count = (pts.length - textPts) * LAYERS + textPts;
   const home = new Float32Array(count * 3);
   const pos = new Float32Array(count * 3);
   const vel = new Float32Array(count * 3);
   const col = new Float32Array(count * 3);
   const rnd = new Float32Array(count);
   const size = new Float32Array(count);
+  const calm = new Float32Array(count);
 
   let k = 0;
   for (let l = 0; l < LAYERS; l++) {
     const dim = l === 0 ? 1 : 0.42 - l * 0.1;
     for (const p of pts) {
+      if (p.text && l > 0) continue;
       const z = (p.front ? 0.32 : 0) - l * DEPTH;
       home[k * 3] = p.x; home[k * 3 + 1] = p.y; home[k * 3 + 2] = z;
       const ang = Math.atan2(p.y, p.x) + (Math.random() - 0.5) * 1.4 + l * 0.35;
@@ -80,7 +95,10 @@ export function initHero() {
       col[k * 3 + 1] = Math.min(1, p.g * dim * glow);
       col[k * 3 + 2] = Math.min(1, p.b * dim * glow);
       rnd[k] = Math.random();
-      size[k] = (p.front ? 1.35 : 0.85) * (0.7 + Math.random() * 0.7);
+      size[k] = p.text
+        ? 1.15 * p.sz
+        : (p.front ? 1.35 : 0.85) * (0.7 + Math.random() * 0.7);
+      calm[k] = p.text ? 1 : 0;
       k++;
     }
   }
@@ -92,6 +110,7 @@ export function initHero() {
   geo.setAttribute('color', new THREE.BufferAttribute(col, 3));
   geo.setAttribute('rnd', new THREE.BufferAttribute(rnd, 1));
   geo.setAttribute('psize', new THREE.BufferAttribute(size, 1));
+  geo.setAttribute('calm', new THREE.BufferAttribute(calm, 1));
 
   const mat = new THREE.ShaderMaterial({
     transparent: true,
@@ -102,12 +121,14 @@ export function initHero() {
       uScale: { value: 1 },
       uTime: { value: 0 },
       uNoiseAmp: { value: reduceMotion ? 0 : 0.11 },
+      uCalm: { value: 1 },
     },
     vertexShader: /* glsl */ `
       attribute vec3 color;
       attribute float rnd;
       attribute float psize;
-      uniform float uSize, uScale, uTime, uNoiseAmp;
+      attribute float calm;
+      uniform float uSize, uScale, uTime, uNoiseAmp, uCalm;
       varying vec3 vColor;
       varying float vRnd;
 
@@ -164,10 +185,11 @@ export function initHero() {
           snoise(np + vec3(31.4, 0.0, 0.0)),
           snoise(np + vec3(0.0, 74.7, 0.0))
         );
-        p += n * uNoiseAmp;
+        float still = calm * uCalm;
+        p += n * uNoiseAmp * (1.0 - still * 0.95);
         vec4 mv = modelViewMatrix * vec4(p, 1.0);
         gl_Position = projectionMatrix * mv;
-        float tw = 0.82 + 0.18 * sin(uTime * 1.6 + rnd * 40.0);
+        float tw = mix(0.82 + 0.18 * sin(uTime * 1.6 + rnd * 40.0), 1.0, still);
         gl_PointSize = uSize * uScale * psize * tw / max(-mv.z, 0.001);
         vColor = color * tw;
         vRnd = rnd;
@@ -336,6 +358,9 @@ export function initHero() {
       pos[i3] = px; pos[i3 + 1] = py; pos[i3 + 2] = pz;
       vel[i3] = vx; vel[i3 + 1] = vy; vel[i3 + 2] = vz;
     }
+    // Text calms down unless the pointer is over the logo.
+    const overLogo = Math.abs(mx) < LOGO_WORLD * 0.55 && Math.abs(my) < LOGO_WORLD * 0.55;
+    mat.uniforms.uCalm.value += ((overLogo ? 0 : 1) - mat.uniforms.uCalm.value) * 0.05;
     posAttr.needsUpdate = true;
     renderer.render(scene, camera);
   }

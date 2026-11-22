@@ -35,7 +35,7 @@ export function initReels(games) {
   track.innerHTML = games.map((g, gi) => `
     <article class="reel" data-i="${gi}" aria-label="${g.title}">
       <div class="reel-slides">
-        ${g.screens.map((s, si) => `<img src="${s}" alt="${g.title} screenshot ${si + 1}" draggable="false" ${gi > 1 ? 'loading="lazy"' : ''}>`).join('')}
+        ${g.screens.map((s, si) => `<img src="${s}" alt="${g.title} screenshot ${si + 1}" draggable="false" decoding="async">`).join('')}
       </div>
       <div class="reel-dots">${g.screens.map(() => '<i></i>').join('')}</div>
       <div class="reel-shade"></div>
@@ -70,7 +70,7 @@ export function initReels(games) {
   let deckCards = [];
   function buildDeck(gi) {
     const g = games[gi];
-    deck.innerHTML = g.screens.map((s) => `<div class="card"><img src="${s}" alt="" draggable="false"></div>`).join('');
+    deck.innerHTML = g.screens.map((s) => `<div class="card"><img src="${s}" alt="" draggable="false" decoding="async"></div>`).join('');
     deckCards = [...deck.children];
     deckCards.forEach((c, i) => c.addEventListener('click', () => setSlide(i)));
     // first frame: start collapsed behind the phone, then fan out
@@ -83,7 +83,7 @@ export function initReels(games) {
   function layoutDeck() {
     const s = slideIdx[current];
     const mobile = innerWidth < 720;
-    const base = mobile ? 118 : Math.min(330, innerWidth * 0.2);
+    const base = mobile ? phone.offsetWidth / 2 + 24 : Math.min(330, innerWidth * 0.2);
     const gap = mobile ? 26 : 70;
     deckCards.forEach((c, i) => {
       const o = i - s, a = Math.abs(o), side = Math.sign(o);
@@ -102,7 +102,7 @@ export function initReels(games) {
       c.style.opacity = a > 3 ? 0 : 1 - (a - 1) * 0.18;
       c.style.zIndex = 10 - a;
       c.style.pointerEvents = 'auto';
-      c.style.filter = `brightness(${1 - (a - 1) * 0.18})`;
+      c.style.setProperty('--dim', ((a - 1) * 0.18).toFixed(2));
     });
   }
 
@@ -111,7 +111,9 @@ export function initReels(games) {
     si = Math.max(0, Math.min(g.screens.length - 1, si));
     slideIdx[current] = si;
     const reel = reels[current];
-    reel.querySelector('.reel-slides').style.transform = `translateX(${-si * 100}%)`;
+    const sl = reel.querySelector('.reel-slides');
+    sl.style.transition = '';
+    sl.style.transform = `translate3d(${-si * 100}%,0,0)`;
     reel.querySelectorAll('.reel-dots i').forEach((d, i) => d.classList.toggle('on', i === si));
     ambient.style.backgroundImage = `url(${g.screens[si]})`;
     layoutDeck();
@@ -120,76 +122,129 @@ export function initReels(games) {
   function setGame(gi) {
     if (gi === current) return;
     current = gi;
-    track.style.transform = `translateY(${-gi * 100}%)`;
     reels.forEach((r, i) => r.classList.toggle('active', i === gi));
     list.querySelectorAll('button').forEach((b, i) => b.classList.toggle('on', i === gi));
-    counter.textContent = `${String(gi + 1).padStart(2, '0')} / ${String(games.length).padStart(2, '0')}`;
+    counter.textContent = `${gi + 1}/${games.length}`;
     buildDeck(gi);
     setSlide(slideIdx[gi]);
   }
 
-  // ── scroll → game index ────────────────────────
+  // ── vertical: scroll-linked track ──────────────
+  // The track follows the scroll continuously: each game "holds" for a while,
+  // then glides into the next. A light lerp smooths out chunky wheel steps.
   const PER_GAME = 0.9; // viewport-heights of scroll per game
+  const HOLD = 0.5;     // share of each game's scroll where the reel stays put
+  let secTop = 0, span = 1, lastW = 0, lastH = 0;
   function sizeSection() {
+    lastW = innerWidth; lastH = innerHeight;
     section.style.height = `${innerHeight * (1 + games.length * PER_GAME)}px`;
+    secTop = section.getBoundingClientRect().top + scrollY;
+    span = Math.max(1, section.offsetHeight - innerHeight);
   }
-  function onScroll() {
-    const top = section.offsetTop;
-    const span = section.offsetHeight - innerHeight;
-    const p = Math.max(0, Math.min(0.9999, (scrollY - top) / span));
-    setGame(Math.floor(p * games.length));
+  function targetPos() {
+    const p = Math.max(0, Math.min(1, (scrollY - secTop) / span));
+    const u = Math.max(0, Math.min(games.length - 1, p * games.length - 0.5));
+    const k = Math.floor(u), t = u - k;
+    const s = Math.max(0, Math.min(1, (t - HOLD / 2) / (1 - HOLD)));
+    return k + s * s * (3 - 2 * s); // smoothstep
   }
+  const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+  let shown = targetPos(), raf = 0;
+  function paint() {
+    track.style.transform = `translate3d(0,${-shown * 100}%,0)`;
+    setGame(Math.round(shown));
+  }
+  function tick() {
+    const target = targetPos();
+    shown += (target - shown) * (reduceMotion ? 1 : 0.2);
+    if (Math.abs(target - shown) < 0.001) shown = target;
+    paint();
+    raf = shown === target ? 0 : requestAnimationFrame(tick);
+  }
+  const onScroll = () => { if (!raf) raf = requestAnimationFrame(tick); };
+
   sizeSection();
-  addEventListener('resize', () => { sizeSection(); onScroll(); layoutDeck(); });
+  addEventListener('resize', () => {
+    // mobile URL bar show/hide fires resize; ignore small height-only changes
+    if (innerWidth === lastW && Math.abs(innerHeight - lastH) < 150) return;
+    sizeSection(); shown = targetPos(); paint(); layoutDeck();
+  });
   addEventListener('scroll', onScroll, { passive: true });
-  onScroll();
-  if (current < 0) setGame(0);
+  paint();
 
   list.addEventListener('click', (e) => {
     const b = e.target.closest('button');
     if (!b) return;
     const i = +b.dataset.i;
-    const span = section.offsetHeight - innerHeight;
-    scrollTo({ top: section.offsetTop + span * ((i + 0.5) / games.length), behavior: 'smooth' });
+    scrollTo({ top: secTop + span * ((i + 0.5) / games.length), behavior: 'smooth' });
   });
 
   // ── horizontal: wheel / swipe / keys ───────────
-  let wheelAcc = 0, wheelLock = 0;
+  const screen = phone.querySelector('.phone-screen');
+  const slidesOf = () => reels[current].querySelector('.reel-slides');
+  // Move the current slides live by px (finger / trackpad follows), with
+  // rubber-band resistance past the first and last screenshot.
+  function dragTo(px) {
+    const si = slideIdx[current], last = games[current].screens.length - 1;
+    if ((si === 0 && px > 0) || (si === last && px < 0)) px *= 0.3;
+    const sl = slidesOf();
+    sl.style.transition = 'none';
+    sl.style.transform = `translate3d(calc(${-si * 100}% + ${px}px),0,0)`;
+  }
+
+  // Trackpad: one gesture = at most one slide. After a page turn the momentum
+  // tail (decaying deltas) is swallowed, but a new swipe is detected right away:
+  // its deltas rise again or change direction, so no need to wait for quiet.
+  let wheelX = 0, wheelIdle = 0, wheelSpent = false, lastAbs = 0, lastSign = 0;
   phone.addEventListener('wheel', (e) => {
     if (Math.abs(e.deltaX) <= Math.abs(e.deltaY)) return; // vertical → page scroll
     e.preventDefault();
-    if (performance.now() < wheelLock) return;
-    wheelAcc += e.deltaX;
-    if (Math.abs(wheelAcc) > 40) {
-      setSlide(slideIdx[current] + Math.sign(wheelAcc));
-      wheelAcc = 0;
-      wheelLock = performance.now() + 450;
+    const dx = e.deltaX * (e.deltaMode === 1 ? 16 : 1);
+    const abs = Math.abs(dx), sign = Math.sign(dx);
+    clearTimeout(wheelIdle);
+    wheelIdle = setTimeout(() => {
+      wheelSpent = false;
+      if (wheelX) { wheelX = 0; setSlide(slideIdx[current]); } // snap back
+    }, 120);
+    if (wheelSpent) {
+      const newGesture = sign !== lastSign || (abs > lastAbs + 4 && abs > 10);
+      lastAbs = abs; lastSign = sign;
+      if (!newGesture) return;
+      wheelSpent = false; wheelX = 0;
     }
+    lastAbs = abs; lastSign = sign;
+    wheelX -= dx;
+    if (Math.abs(wheelX) > screen.clientWidth * 0.2) {
+      const dir = -Math.sign(wheelX);
+      wheelX = 0; wheelSpent = true;
+      setSlide(slideIdx[current] + dir);
+    } else dragTo(wheelX);
   }, { passive: false });
 
-  // pointer drag (mouse + touch). touch-action: pan-y lets vertical scroll through.
-  let sx = 0, sy = 0, dragging = false, moved = false;
-  const slidesOf = () => reels[current].querySelector('.reel-slides');
+  // Pointer drag (mouse + touch). touch-action: pan-y lets vertical scroll through.
+  let sx = 0, sy = 0, st = 0, dragging = false, axis = '';
   phone.addEventListener('pointerdown', (e) => {
-    if (e.target.closest('a,button')) return;
-    sx = e.clientX; sy = e.clientY; dragging = true; moved = false;
+    if (e.target.closest('a,button') || e.button > 0) return;
+    sx = e.clientX; sy = e.clientY; st = performance.now();
+    dragging = true; axis = '';
   });
   addEventListener('pointermove', (e) => {
     if (!dragging) return;
-    const dx = e.clientX - sx;
-    if (Math.abs(dx) > 6) moved = true;
-    const sl = slidesOf();
-    sl.style.transition = 'none';
-    sl.style.transform = `translateX(calc(${-slideIdx[current] * 100}% + ${dx * 0.9}px))`;
+    const dx = e.clientX - sx, dy = e.clientY - sy;
+    if (!axis) {
+      if (Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+      axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+    }
+    if (axis === 'x') dragTo(dx);
   });
   const endDrag = (e) => {
     if (!dragging) return;
     dragging = false;
-    const sl = slidesOf();
-    sl.style.transition = '';
-    const dx = e.clientX - sx, dy = e.clientY - sy;
+    if (axis !== 'x') return;
+    const dx = e.clientX - sx;
+    const fast = Math.abs(dx) > 20 && performance.now() - st < 250; // flick
     // pointercancel = browser took over (vertical scroll) → just snap back
-    if (e.type === 'pointerup' && Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) setSlide(slideIdx[current] - Math.sign(dx));
+    if (e.type === 'pointerup' && (fast || Math.abs(dx) > screen.clientWidth * 0.2)) setSlide(slideIdx[current] - Math.sign(dx));
     else setSlide(slideIdx[current]);
   };
   addEventListener('pointerup', endDrag);

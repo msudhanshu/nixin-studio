@@ -1,8 +1,11 @@
 import { initHero } from './hero.js';
 import { initReels } from './reels.js';
 import { initDesktop } from './desktop.js';
+import { initScrollNav } from './scrollnav.js';
 import { loadLogo, logoDataURL } from './logo.js';
 import { loadGames, toReelGame } from './catalog.js';
+import { buildIndex } from './search-index.js';
+import { initSearch } from './search.js';
 
 await loadLogo();
 
@@ -12,14 +15,20 @@ fav.rel = 'icon';
 fav.href = logoDataURL(128);
 document.head.appendChild(fav);
 
+initScrollNav();
 const desktop = initDesktop(); // home screen (lays out the logo slot the particles fit into)
 try { initHero(); } catch (e) { console.error(e); document.body.classList.add('no-webgl'); }
 
+let games = [];
 try {
-  const games = await loadGames();
+  games = await loadGames();
   desktop.setGames(games);
-  initReels(games.map(toReelGame));
+  // the reel only features games people can already play: live + testing
+  initReels(games.filter((g) => ['live', 'testing'].includes(g.status || 'live')).map(toReelGame));
 } catch (e) {
   console.error(e);
   desktop.setGames([]);
 }
+
+// site-wide search: games, studio, people, apps
+initSearch({ index: buildIndex(games, desktop.apps), actions: desktop }).catch((e) => console.error(e));

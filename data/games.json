@@ -7,6 +7,11 @@
       "tagline": "Fuse elements. Form compounds.",
       "description": "A match-3 merge puzzle about real chemistry. Swap, slide or scroll neighbouring elements into line so they fuse into a higher tier — then into compounds. Climb RnD Centers, react in the lab, and unlock notebook pages for every element and compound: the reaction, where it is used, and how we get it. The chemistry puzzle for grown-ups.",
       "genre": "Puzzle · Merge",
+      "status": "testing",
+      "sizeMb": null,
+      "released": null,
+      "rating": null,
+      "downloads": null,
       "tags": ["puzzle", "merge", "chemistry"],
       "accent": "#C8F54A",
       "palette": ["#071A14", "#0E3D30", "#C8F54A", "#7EE8C8"],
@@ -45,6 +50,7 @@
         }
       ],
       "video": null,
+      "preview": null,
       "page": "game.html?id=alchemy",
       "store": {
         "play": "https://play.google.com/store/apps/details?id=com.nixin.alchemym3m",
@@ -60,6 +66,11 @@
       "tagline": "Watch the path. Walk it from memory.",
       "description": "A path lights up once. Then it is gone, and you have to walk it from memory — tile by tile, with lives on the line. Four arenas push the same idea further: a glowing tile grid, node graphs across rivers and neon nights, a scout helicopter over the city, and first-person mazes you only saw once.",
       "genre": "Puzzle · Memory",
+      "status": "live",
+      "sizeMb": null,
+      "released": null,
+      "rating": null,
+      "downloads": null,
       "tags": ["puzzle", "memory", "casual"],
       "accent": "#2ED4BF",
       "palette": ["#0A0D21", "#212961", "#2ED4BF", "#FFC740"],
@@ -88,6 +99,7 @@
         }
       ],
       "video": null,
+      "preview": null,
       "page": "game.html?id=memory_path",
       "store": {
         "play": "https://play.google.com/store/apps/details?id=com.nixin.memorizewayhome",
@@ -103,6 +115,11 @@
       "tagline": "Slide, swap and scroll colours into place.",
       "description": "Unlock Disk is a colour-matching puzzle on spinning disks. Slide pieces around a gap, swap neighbouring tiles, or scroll rings and rows until every ring is one colour. Later levels cut famous paintings into the same spinning disks, so you are rebuilding a picture as well as solving a puzzle.",
       "genre": "Puzzle · Sliding",
+      "status": "testing",
+      "sizeMb": null,
+      "released": null,
+      "rating": null,
+      "downloads": null,
       "tags": ["puzzle", "sliding", "colors"],
       "accent": "#00D1EB",
       "palette": ["#0F0E36", "#1F2161", "#00D1EB", "#FF9E00"],
@@ -131,6 +148,7 @@
         }
       ],
       "video": null,
+      "preview": null,
       "page": "game.html?id=unlock_disk",
       "store": {
         "play": "https://play.google.com/store/apps/details?id=com.nixin.unlockdisk",
@@ -146,6 +164,11 @@
       "tagline": "Trace the trail before the targets fade.",
       "description": "Swipe a trail of touching hexes to spell the targets before they fade. Some words are shown as pictures, some are jumbled with the first letter kept, and later modes swap numbers, slide symbols into a gap, or scroll the honeycomb itself. Quick to learn, and the clock is always running.",
       "genre": "Word · Puzzle",
+      "status": "testing",
+      "sizeMb": null,
+      "released": null,
+      "rating": null,
+      "downloads": null,
       "tags": ["word", "puzzle", "hex"],
       "accent": "#FFA62B",
       "palette": ["#0F173D", "#213370", "#FFA62B", "#78EBFF"],
@@ -174,6 +197,7 @@
         }
       ],
       "video": null,
+      "preview": null,
       "page": "game.html?id=word_trail",
       "store": {
         "play": "https://play.google.com/store/apps/details?id=com.nixinstudio.wordtrail",
@@ -189,6 +213,11 @@
       "tagline": "Guess the film. Emoji, charades, scenes.",
       "description": "Guess the film from emoji plots, dumb-charade clues, jumbled dialogues and ripple scenes. Movieyapa covers Bollywood, Tollywood, Hollywood and Bhojpuri hits, with mix grids and daily events mixed in. Fewer clues means more points — lights, camera, guess.",
       "genre": "Trivia · Movies",
+      "status": "live",
+      "sizeMb": null,
+      "released": null,
+      "rating": null,
+      "downloads": null,
       "tags": ["trivia", "movies", "bollywood"],
       "accent": "#F5B838",
       "palette": ["#140D08", "#4D301C", "#F5B838", "#FAEDCF"],
@@ -222,6 +251,7 @@
         }
       ],
       "video": null,
+      "preview": null,
       "page": "game.html?id=movieyapa",
       "store": {
         "play": "https://play.google.com/store/apps/details?id=com.nixin.movieyapa",
@@ -237,6 +267,11 @@
       "tagline": "Find the hidden faces inside the mosaic.",
       "description": "A picture starts as a grey mosaic of tiny shapes. Drag a magnifier over it to reveal colour, then tap the faces hidden among the tiles — animals tucked into thousands of pieces. Find every face and the whole mosaic bursts into colour.",
       "genre": "Puzzle · Hidden object",
+      "status": "dev",
+      "sizeMb": null,
+      "released": null,
+      "rating": null,
+      "downloads": null,
       "tags": ["puzzle", "hiddenObject", "mosaic"],
       "accent": "#7C4DFF",
       "palette": ["#1C1242", "#6B3BFF", "#7C4DFF", "#FFC93D"],
@@ -260,6 +295,7 @@
         }
       ],
       "video": null,
+      "preview": null,
       "page": "game.html?id=hidden_mosaic",
       "store": {
         "play": "https://play.google.com/store/apps/details?id=com.nixin.hiddenmosaic",
@@ -275,6 +311,11 @@
       "tagline": "Cards, Ludo, Chess, UNO, Trump, Mafia.",
       "description": "A table of studio card and board games in one place. Play Teen Patti, Bluff, Hearts and 29, race in Ludo, sit down for Chess, match colours in UNO, call trump, or bluff your way through Mafia — solo or with friends.",
       "genre": "Cards · Board",
+      "status": "ideation",
+      "sizeMb": null,
+      "released": null,
+      "rating": null,
+      "downloads": null,
       "tags": ["cards", "board", "multiplayer"],
       "accent": "#DB3359",
       "palette": ["#1A080C", "#4A1520", "#DB3359", "#F4B942"],
@@ -308,6 +349,7 @@
         }
       ],
       "video": null,
+      "preview": null,
       "page": "game.html?id=card_board_games",
       "store": {
         "play": "https://play.google.com/store/apps/details?id=com.DefaultCompany.inhousecardboard",
