@@ -3,6 +3,7 @@
 // unlocked, icons act as the site menu. Opened apps show in the taskbar (desktop)
 // or dock (mobile); clicking an opened app there minimises / restores it.
 import { apps as allApps, studio } from './data.js';
+import { createShell } from './terminal.js';
 
 // Inside the phone preview frame there is no "Mobile View" icon.
 const embedded = window.self !== window.top;
@@ -28,6 +29,9 @@ const glyph = {
   video: '<svg viewBox="0 0 48 48"><rect x="4" y="10" width="40" height="28" rx="5" fill="#6a2cff"/><path fill="#fff" d="M20 17v14l12-7z"/></svg>',
   in: '<svg viewBox="0 0 48 48"><rect x="4" y="4" width="40" height="40" rx="8" fill="#0a66c2"/><circle cx="15.2" cy="14.6" r="3.1" fill="#fff"/><rect x="12.5" y="20" width="5.4" height="16" rx=".6" fill="#fff"/><path fill="none" stroke="#fff" stroke-width="5.2" d="M24.2 36V20M24.2 27.4a5.1 5.1 0 0 1 10.2 0V36"/></svg>',
   browser: '<svg viewBox="0 0 48 48"><path fill="#ea4335" d="M24 24 6.68 14A20 20 0 0 1 41.32 14z"/><path fill="#fbbc04" d="M24 24 41.32 14A20 20 0 0 1 24 44z"/><path fill="#34a853" d="M24 24 24 44A20 20 0 0 1 6.68 14z"/><circle cx="24" cy="24" r="10" fill="#fff"/><circle cx="24" cy="24" r="7.8" fill="#4285f4"/></svg>',
+  whatsapp: '<svg viewBox="0 0 48 48"><path fill="#25d366" d="M24 4.5a19.5 19.5 0 0 0-16.8 29.3L5 43.2l9.7-2.5A19.5 19.5 0 1 0 24 4.5z"/><path fill="#fff" d="M33.6 28.2c-.4-.2-2.5-1.2-2.9-1.4-.4-.1-.7-.2-.9.2-.3.4-1.1 1.4-1.3 1.6-.2.3-.5.3-.9.1-1.4-.6-2.7-1.4-3.8-2.8-1-1.1-1.8-2.3-2-2.8-.2-.4 0-.6.2-.9.2-.2.4-.5.5-.7.2-.2.2-.4.3-.7.1-.3 0-.5 0-.7-.1-.2-.9-2.1-1.2-2.9-.3-.7-.7-.6-1-.6h-.8c-.3 0-.7.1-1.1.5-.4.4-1.4 1.4-1.4 3.4s1.5 3.9 1.7 4.2c.2.3 2.8 4.5 6.9 6.1 3.3 1.3 3.3.9 4 .8.6 0 2-.8 2.3-1.6.3-.8.3-1.5.2-1.6-.1-.2-.4-.3-.8-.5z"/></svg>',
+  terminal: '<svg viewBox="0 0 48 48"><rect x="4" y="6" width="40" height="36" rx="8" fill="#14151c"/><path fill="none" stroke="#3dd68c" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" d="M13 18l7 6-7 6M24 30h11"/></svg>',
+  image: '<svg viewBox="0 0 48 48"><rect x="4" y="8" width="40" height="32" rx="6" fill="#2b2f3d"/><circle cx="16" cy="18" r="4" fill="#f4b942"/><path fill="#6ea8ff" d="M8 34l10-10 7 7 5-5 10 8z"/></svg>',
 };
 
 // ── About Us: profile pages inside a browser-style window ──
@@ -116,6 +120,7 @@ function iconMarkup(app) {
 
 export function initDesktop() {
   const root = document.getElementById('home');
+  const shell = createShell();
   const iconsEl = root.querySelector('.os-icons');
   const winsEl = root.querySelector('.os-windows');
   const runEl = root.querySelector('.os-running');
@@ -126,6 +131,7 @@ export function initDesktop() {
   const isMobile = () => innerWidth < 720;
   let catalog = [];
   let catalogReady = false;
+  let photo = null; // picture currently shown in Image Viewer
 
   document.querySelectorAll('[data-logo]').forEach((img) => (img.src = logo));
   ensureSketchFilter();
@@ -273,6 +279,137 @@ export function initDesktop() {
     return id && tabsState.has(id) ? id : null;
   }
 
+  // Fake WhatsApp. One open chat with a small FAQ bot; the other threads stay locked.
+  const WA_TINTS = ['#3d4f5f', '#4a5560', '#5c4a42', '#3e4d3a'];
+  const waMemory = new Map();
+  const waClock = (t) => new Date(t).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' });
+  function waThread() {
+    if (!waMemory.has('nixin')) {
+      waMemory.set('nixin', [{
+        from: 'bot',
+        t: Date.now(),
+        text: 'Hey, this is Nixin. Ask me about our games, jobs, or how to reach the studio.',
+      }]);
+    }
+    return waMemory.get('nixin');
+  }
+  function asks(q, ...keys) {
+    return keys.some((k) => new RegExp(`\\b${k}\\b`, 'i').test(q));
+  }
+  function nixinReply(raw) {
+    const q = raw.trim();
+    const named = catalog.find((g) => q.toLowerCase().includes(String(g.name || '').toLowerCase()) && g.name);
+    if (named) {
+      return `${named.name} — ${named.tagline || 'One of our games.'}${named.description ? ' ' + named.description : ''}`;
+    }
+    if (asks(q, 'game', 'games', 'play', 'title', 'titles', 'download')) {
+      const names = catalog.filter((g) => statusOf(g) === 'live').map((g) => g.name);
+      return names.length
+        ? `We make small games you can finish in a pocket of time. Out now: ${names.join(', ')}. Open Our Games on the home screen for screenshots and store links.`
+        : 'The game list is still loading. Open Our Games on the home screen in a moment.';
+    }
+    if (asks(q, 'job', 'jobs', 'career', 'careers', 'hire', 'hiring', 'work', 'role', 'roles')) {
+      return 'We are a two-person studio and we read portfolios. Open roles we talk about: Unity gameplay, 2D / 3D art, and casual / puzzle design. Write to hello@nixin.studio.';
+    }
+    if (asks(q, 'contact', 'email', 'mail', 'reach', 'phone')) {
+      return `Email ${studio.email}. The Contact app on this desktop opens a new message too.`;
+    }
+    if (asks(q, 'reel', 'reels', 'instagram', 'feed', 'video')) {
+      return 'The Game Reel icon scrolls down to the feed. On desktop, scroll for the next game. On a phone, swipe the phone sideways for more screens.';
+    }
+    if (asks(q, 'who', 'about', 'studio', 'nixin', 'team')) {
+      return 'Nixin Studio is a small independent game studio. We make games that are quick to learn and hard to put down. The About icon has the people behind it.';
+    }
+    if (asks(q, 'help', 'faq', 'menu')) {
+      return 'I can answer a few things: our games, a game by name, jobs, the reel, and how to contact us.';
+    }
+    if (asks(q, 'hi', 'hey', 'hello', 'yo', 'hola')) {
+      return 'Hey. Ask me about our games, jobs, or how to reach the studio.';
+    }
+    return "I don't have a real answer for that yet. Try games, jobs, or contact.";
+  }
+  function waBubble(m) {
+    return `<div class="wa-bubble ${m.from === 'me' ? 'me' : 'bot'}">${escapeHtml(m.text)}<time>${waClock(m.t)}</time></div>`;
+  }
+  function whatsAppBody(a) {
+    const rows = (a.chats || []).map((c, i) => {
+      const tint = WA_TINTS[i % WA_TINTS.length];
+      const face = c.open
+        ? `<img src="${logo}" alt="">`
+        : esc(initials(c.name));
+      const last = c.open ? waThread().at(-1)?.text : 'Locked';
+      return `<button class="wa-row ${c.open ? 'on' : ''}" ${c.locked ? 'disabled' : 'data-wa-open'} type="button">
+        <span class="wa-av" style="--tint:${tint}">${face}</span>
+        <span class="wa-meta"><b>${esc(c.name)}</b><small>${esc(last || '')}</small></span>
+        ${c.locked ? `<span class="wa-lock" aria-hidden="true">${SVG_LOCK}</span>` : ''}
+      </button>`;
+    }).join('');
+    return `<div class="wa">
+      <aside class="wa-side">
+        <header class="wa-side-h"><b>Chats</b></header>
+        <div class="wa-list">${rows}</div>
+      </aside>
+      <section class="wa-chat">
+        <header class="wa-head">
+          <button class="wa-back" type="button" data-wa-back aria-label="Back to chats">‹</button>
+          <span class="wa-av"><img src="${logo}" alt=""></span>
+          <span class="wa-meta"><b>Nixin</b><small>studio</small></span>
+        </header>
+        <div class="wa-log" aria-live="polite">${waThread().map(waBubble).join('')}</div>
+        <div class="wa-chips">
+          <button type="button" data-wa-q="What games do you make?">Games</button>
+          <button type="button" data-wa-q="Are you hiring?">Jobs</button>
+          <button type="button" data-wa-q="How do I contact you?">Contact</button>
+        </div>
+        <form class="wa-form">
+          <input type="text" name="msg" placeholder="Message" autocomplete="off" aria-label="Message Nixin">
+          <button type="submit" aria-label="Send">➤</button>
+        </form>
+      </section>
+    </div>`;
+  }
+  function bindWhatsApp(el) {
+    const root = el.querySelector('.wa');
+    const log = el.querySelector('.wa-log');
+    const form = el.querySelector('.wa-form');
+    const input = form.querySelector('input');
+    const thread = waThread();
+    const preview = el.querySelector('.wa-row.on small');
+    const paint = () => {
+      log.innerHTML = thread.map(waBubble).join('');
+      log.scrollTop = log.scrollHeight;
+      const last = thread.at(-1);
+      if (preview && last) preview.textContent = last.text;
+    };
+    log.scrollTop = log.scrollHeight;
+    let pending = 0;
+    function say(text) {
+      const clean = text.trim();
+      if (!clean || pending) return;
+      thread.push({ from: 'me', t: Date.now(), text: clean });
+      paint();
+      input.value = '';
+      pending = 1;
+      const hold = document.createElement('div');
+      hold.className = 'wa-bubble bot typing';
+      hold.innerHTML = '<i></i><i></i><i></i>';
+      log.appendChild(hold);
+      log.scrollTop = log.scrollHeight;
+      setTimeout(() => {
+        pending = 0;
+        thread.push({ from: 'bot', t: Date.now(), text: nixinReply(clean) });
+        paint();
+      }, 420);
+    }
+    form.addEventListener('submit', (e) => { e.preventDefault(); say(input.value); });
+    el.querySelector('.wa-chips').addEventListener('click', (e) => {
+      const q = e.target.closest('[data-wa-q]')?.dataset.waQ;
+      if (q) say(q);
+    });
+    el.querySelector('[data-wa-back]')?.addEventListener('click', () => root.classList.add('show-list'));
+    el.querySelector('[data-wa-open]')?.addEventListener('click', () => root.classList.remove('show-list'));
+  }
+
   function contentFor(a) {
     switch (a.type) {
       case 'profile':
@@ -294,6 +431,18 @@ export function initDesktop() {
         return libraryBody();
       case 'viewer':
         return viewerBody(a.game);
+      case 'whatsapp':
+        return whatsAppBody(a);
+      case 'image':
+        return imageBody();
+      case 'terminal':
+        return `<div class="term">
+          <div class="term-log" role="log" aria-live="polite"></div>
+          <div class="term-line">
+            <span class="term-prompt"></span>
+            <input class="term-in" spellcheck="false" autocomplete="off" autocapitalize="off" aria-label="Terminal command">
+          </div>
+        </div>`;
       case 'mail':
         return `<form class="mail">
           <label><span>To</span><input value="${studio.email}" readonly></label>
@@ -498,6 +647,7 @@ export function initDesktop() {
       restore(a.id);
       if (opts.max) w.el.classList.add('max');
       focus(w.el);
+      if (a.type === 'terminal') w.el.querySelector('.term-in')?.focus({ preventScroll: true });
       return;
     }
 
@@ -512,6 +662,7 @@ export function initDesktop() {
     el.style.top = `${8 + ((n * 5) % 22)}%`;
     if (a.type === 'library') { el.style.left = 'calc((100% - min(1200px, 94%)) / 2)'; el.style.top = '3%'; }
     if (a.type === 'profile') { el.style.left = 'calc((100% - min(1100px, 94%)) / 2)'; el.style.top = '4%'; }
+    if (a.type === 'whatsapp') { el.style.left = 'calc((100% - min(980px, 90%)) / 2)'; el.style.top = '4%'; }
     if (opts.max) el.classList.add('max');
     if (a.type === 'library' && isMobile()) el.classList.add('win-folder');
     const barLead = a.type === 'profile'
@@ -544,6 +695,8 @@ export function initDesktop() {
       if (act === 'close') close(a.id);
     });
     bar.addEventListener('dblclick', (e) => { if (!e.target.closest('button, .br-tab')) el.classList.toggle('max'); });
+    if (a.type === 'whatsapp') bindWhatsApp(el);
+    if (a.type === 'terminal') bindTerminal(el);
     const form = el.querySelector('form.mail');
     if (form) form.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -614,8 +767,186 @@ export function initDesktop() {
     document.body.appendChild(ov);
   }
 
+  // ── terminal ───────────────────────────────────
+  // Keys often stay on the icon button that opened the window (a delayed
+  // focus() is ignored). While Terminal is the front window, route those
+  // keys into the prompt ourselves.
+  document.addEventListener('keydown', (e) => {
+    const input = root.querySelector('.win-terminal.focused:not(.min):not(.closing) .term-in');
+    if (!input?._termKey || e.target === input) return;
+    if (e.target.closest?.('input, textarea, select, [contenteditable="true"]')) return;
+    if (root.querySelector('.srch-sheet.open')) return;
+    if (!input._termKey(e, 'route')) return;
+    e.stopPropagation();
+    if (document.activeElement !== input) input.focus();
+  }, true);
+
+  function bindTerminal(el) {
+    const log = el.querySelector('.term-log');
+    const promptEl = el.querySelector('.term-prompt');
+    const input = el.querySelector('.term-in');
+    const write = (text, err) => {
+      if (text == null || text === '') return;
+      const row = document.createElement('div');
+      row.className = 'term-block' + (err ? ' term-err' : '');
+      row.textContent = text.endsWith('\n') ? text.slice(0, -1) : text;
+      log.appendChild(row);
+    };
+    const freeze = (line) => {
+      const row = document.createElement('div');
+      row.className = 'term-row term-cmd';
+      const p = document.createElement('span');
+      p.className = 'term-prompt';
+      p.textContent = promptEl.textContent;
+      const c = document.createElement('span');
+      c.textContent = line;
+      row.append(p, c);
+      log.appendChild(row);
+    };
+    const wipe = () => log.replaceChildren();
+    const scroll = () => { log.scrollTop = log.scrollHeight; };
+    const refresh = () => { promptEl.textContent = shell.prompt(); };
+    const placeEnd = () => {
+      const n = input.value.length;
+      try { input.setSelectionRange(n, n); } catch { /* input not focused yet */ }
+    };
+    const putChar = (ch) => {
+      const s = input.selectionStart ?? input.value.length;
+      const t = input.selectionEnd ?? s;
+      if (typeof input.setRangeText === 'function') input.setRangeText(ch, s, t, 'end');
+      else input.value = input.value.slice(0, s) + ch + input.value.slice(t);
+    };
+    const rub = (back) => {
+      const s = input.selectionStart ?? input.value.length;
+      const t = input.selectionEnd ?? s;
+      if (s !== t) input.setRangeText('', s, t, 'end');
+      else if (back && s > 0) input.setRangeText('', s - 1, s, 'end');
+      else if (!back && t < input.value.length) input.setRangeText('', t, t + 1, 'end');
+    };
+    const submit = () => {
+      const line = input.value;
+      freeze(line);
+      input.value = '';
+      const res = shell.exec(line);
+      if (res.clear) wipe();
+      for (const b of res.blocks) write(b.text, b.err);
+      refresh();
+      runActions(res.actions);
+      scroll();
+    };
+
+    input._termKey = (e, source) => {
+      const plain = !e.metaKey && !e.ctrlKey && !e.altKey;
+      if (e.key === 'Enter') { e.preventDefault(); submit(); return true; }
+      if (e.key === 'ArrowUp') { e.preventDefault(); input.value = shell.older(input.value); placeEnd(); return true; }
+      if (e.key === 'ArrowDown') { e.preventDefault(); input.value = shell.newer(input.value); placeEnd(); return true; }
+      if (e.key === 'Tab') {
+        e.preventDefault();
+        const done = shell.complete(input.value);
+        input.value = done.line;
+        if (done.matches.length > 1) { write(done.matches.join('  ')); scroll(); }
+        return true;
+      }
+      if (e.key === 'l' && e.ctrlKey && !e.metaKey && !e.altKey) { e.preventDefault(); wipe(); scroll(); return true; }
+      if (e.key === 'c' && e.ctrlKey && !e.metaKey && !e.altKey) {
+        e.preventDefault();
+        freeze(input.value + '^C');
+        input.value = '';
+        shell.cancelHistory();
+        scroll();
+        return true;
+      }
+      if (source !== 'route' || !plain) return false;
+      if (e.key === 'Backspace') { e.preventDefault(); rub(true); return true; }
+      if (e.key === 'Delete') { e.preventDefault(); rub(false); return true; }
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight' || e.key === 'Home' || e.key === 'End') {
+        e.preventDefault();
+        const n = input.value.length;
+        let s = input.selectionStart ?? n;
+        if (e.key === 'Home') s = 0;
+        else if (e.key === 'End') s = n;
+        else if (e.key === 'ArrowLeft') s = Math.max(0, s - 1);
+        else s = Math.min(n, s + 1);
+        input.focus();
+        input.setSelectionRange(s, s);
+        return true;
+      }
+      if (e.key.length === 1) { e.preventDefault(); putChar(e.key); return true; }
+      return false;
+    };
+
+    write('Nixin Studio terminal\nType `help` for commands. `open <name>` launches an app or page.');
+    refresh();
+    input.focus();
+
+    input.addEventListener('keydown', (e) => input._termKey(e, 'input'));
+    el.querySelector('.term').addEventListener('pointerdown', (e) => {
+      if (e.target.closest('.win-bar, button, a')) return;
+      if (e.target === input) return;
+      input.focus();
+      placeEnd();
+    });
+  }
+
+  function imageBody() {
+    if (!photo?.src) {
+      return `<div class="iv iv-empty"><p>No picture open.</p><p>Click a picture on a game or About page, or run <b>open file.jpg</b> in Terminal.</p></div>`;
+    }
+    return `<div class="iv">
+      <div class="iv-stage"><img src="${escapeHtml(photo.src)}" alt="${escapeHtml(photo.title || '')}"></div>
+      <p class="iv-cap">${escapeHtml(photo.title || '')}</p>
+    </div>`;
+  }
+
+  function fileTitle(src) {
+    if (!src || src.startsWith('data:')) return 'Image';
+    try { return decodeURIComponent(src.split('/').pop().split('?')[0]) || 'Image'; }
+    catch { return 'Image'; }
+  }
+
+  function openImage(src, title) {
+    if (!src) return;
+    photo = { src, title: title || fileTitle(src) };
+    const a = apps.find((x) => x.id === 'photos');
+    if (!open.has('photos')) openApp(a, { max: true });
+    const w = open.get('photos');
+    if (!w) return;
+    w.el.classList.add('max');
+    w.el.setAttribute('aria-label', photo.title);
+    const titleEl = w.el.querySelector('.win-title');
+    if (titleEl) titleEl.textContent = photo.title;
+    w.el.querySelector('.win-body').innerHTML = imageBody();
+    restore('photos');
+    focus(w.el);
+  }
+
+  function runActions(actions) {
+    for (const a of actions || []) {
+      if (a.type === 'image') openImage(a.src, a.title);
+      else if (a.type === 'app' || a.type === 'locked') openApp(apps.find((x) => x.id === a.id));
+      else if (a.type === 'game') {
+        const game = catalog.find((g) => g.id === a.id);
+        if (game) openApp(viewerApp(game), { max: true });
+      } else if (a.type === 'member') {
+        const app = apps.find((x) => x.type === 'profile' && (x.members || []).some((m) => m.id === a.id));
+        if (!app) continue;
+        openApp(app);
+        const st = tabsState.get(app.id);
+        if (!st) continue;
+        showMember(st, a.id);
+        renderProfile(app.id);
+      } else if (a.type === 'url' && a.url) window.open(a.url, '_blank', 'noopener');
+    }
+  }
+
   // ── clicks ─────────────────────────────────────
   root.addEventListener('click', (e) => {
+    const pic = e.target.closest?.('img');
+    if (pic?.src && pic.closest('.gp-gallery, .gp-hero, .pf') && !pic.closest('.gp-more, a')) {
+      const cap = pic.closest('figure')?.querySelector('b')?.textContent;
+      openImage(pic.currentSrc || pic.src, (cap || pic.alt || '').trim());
+      return;
+    }
     // About Us browser: tabs, member links, toolbar
     const pid = profileOf(e.target);
     if (pid) {
@@ -686,8 +1017,13 @@ export function initDesktop() {
     }
     const b = e.target.closest('.os-icon, .sm-list [data-app], .os-dock [data-app]');
     if (b) {
-      openApp(apps.find((x) => x.id === b.dataset.app));
+      const app = apps.find((x) => x.id === b.dataset.app);
+      openApp(app);
       startMenu.classList.remove('open');
+      if (app?.type === 'terminal') {
+        b.blur();
+        root.querySelector('.win-terminal.focused .term-in')?.focus();
+      }
       return;
     }
     const shareBtn = e.target.closest('[data-share]');
@@ -839,6 +1175,8 @@ export function initDesktop() {
     setGames(list) {
       catalog = list || [];
       catalogReady = true;
+      shell.setGames(catalog);
+      root.querySelectorAll('.win-terminal .term-line .term-prompt').forEach((el) => { el.textContent = shell.prompt(); });
       folderGames = STATUSES.flatMap((st) => catalog.filter((g) => statusOf(g) === st.id));
       const libApp = apps.find((a) => a.type === 'library');
       if (libApp) root.querySelectorAll(`.os-icon[data-app="${libApp.id}"] .os-glyph, .sm-list [data-app="${libApp.id}"] .os-glyph`)

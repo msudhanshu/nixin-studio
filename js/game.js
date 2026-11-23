@@ -94,3 +94,22 @@ try {
   console.error(err);
   renderMissing();
 }
+
+document.getElementById('game').addEventListener('click', (e) => {
+  const pic = e.target.closest('.gp-gallery img, .gp-hero .gp-icon');
+  if (!pic?.src) return;
+  const cap = pic.closest('figure')?.querySelector('b')?.textContent?.trim();
+  const title = cap || pic.alt || 'Image';
+  let ov = document.querySelector('.iv-overlay');
+  if (!ov) {
+    ov = document.createElement('div');
+    ov.className = 'iv-overlay';
+    ov.innerHTML = '<button type="button" class="iv-x" aria-label="Close">✕</button><img alt=""><p></p>';
+    ov.addEventListener('click', (ev) => { if (ev.target === ov || ev.target.closest('.iv-x')) ov.remove(); });
+    document.addEventListener('keydown', (ev) => { if (ev.key === 'Escape') document.querySelector('.iv-overlay')?.remove(); });
+  }
+  ov.querySelector('img').src = pic.currentSrc || pic.src;
+  ov.querySelector('img').alt = title;
+  ov.querySelector('p').textContent = title;
+  document.body.appendChild(ov);
+});

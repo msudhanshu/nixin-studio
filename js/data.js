@@ -9,7 +9,7 @@ export const studio = {
 };
 
 // Home-screen apps (section 1).
-// type: 'notepad' | 'explorer' | 'library' | 'mail' | 'profile' | 'link' (href = where it scrolls/goes)
+// type: 'notepad' | 'explorer' | 'library' | 'mail' | 'profile' | 'whatsapp' | 'link' (href = where it scrolls/goes)
 // dock: true → lives in the mobile dock instead of the mobile app grid.
 export const apps = [
   {
@@ -101,6 +101,21 @@ What we care about
     title: 'Game Reel',
   },
   {
+    id: 'whatsapp',
+    label: 'WhatsApp',
+    short: 'WhatsApp',
+    icon: 'whatsapp',
+    type: 'whatsapp',
+    title: 'WhatsApp',
+    chats: [
+      { id: 'nixin', name: 'Nixin', open: true },
+      { id: 'playtest', name: 'Playtesters', locked: true },
+      { id: 'alex', name: 'Alex', locked: true },
+      { id: 'sam', name: 'Sam', locked: true },
+      { id: 'riya', name: 'Riya', locked: true },
+    ],
+  },
+  {
     id: 'careers',
     rk: 1, // desktop: right column, 2nd from bottom
     label: 'Careers.txt',
@@ -157,6 +172,23 @@ Send your portfolio to the Contact app on this desktop.
     title: 'Recycle Bin',
     files: [],
     empty: 'Nothing here. We ship everything.',
+  },
+  {
+    id: 'photos',
+    label: 'Image Viewer',
+    short: 'Photos',
+    icon: 'image',
+    type: 'image',
+    title: 'Image Viewer',
+  },
+  {
+    id: 'terminal',
+    rk: 3, // desktop: right column, above Mobile View
+    label: 'Terminal',
+    short: 'Terminal',
+    icon: 'terminal',
+    type: 'terminal',
+    title: 'Terminal',
   },
   {
     id: 'mobileview',

@@ -32,3 +32,8 @@ try {
 
 // site-wide search: games, studio, people, apps
 initSearch({ index: buildIndex(games, desktop.apps), actions: desktop }).catch((e) => console.error(e));
+
+// PWA: lets Chrome offer "Install app" (needs https or localhost)
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch((e) => console.warn('Service worker not registered', e));
+}
